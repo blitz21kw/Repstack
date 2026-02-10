@@ -627,15 +627,23 @@ export function recoverActiveWorkout():
       return value;
     });
 
-    // Don't recover completed workouts - they should be cleared
-    if (workout.completed) {
+    // Validate that we have a non-null object (but not an array)
+    if (!workout || typeof workout !== 'object' || Array.isArray(workout)) {
       localStorage.removeItem('activeWorkout');
       return null;
     }
 
-    return workout;
+    // Don't recover completed workouts - they should be cleared
+    if ((workout as import('../types/models').Workout).completed) {
+      localStorage.removeItem('activeWorkout');
+      return null;
+    }
+
+    return workout as import('../types/models').Workout;
   } catch (error) {
     console.error('Failed to recover active workout:', error);
+    // Clear corrupted data
+    localStorage.removeItem('activeWorkout');
     return null;
   }
 }
