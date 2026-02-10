@@ -1,6 +1,9 @@
 /**
  * Hook for managing rest timer between sets
  * Supports audio alerts, vibration, and configurable duration
+ *
+ * Uses timestamp-based timing to remain accurate even when the screen
+ * locks or the browser throttles setInterval (mobile devices)
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -37,9 +40,18 @@ export function useRestTimer(
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+
+  // Timestamp-based tracking for accuracy across screen locks
+  const endTimeRef = useRef<number | null>(null);
+  const pausedTimeRemainingRef = useRef<number>(0);
   const intervalRef = useRef<number | null>(null);
+  const hasAlertedRef = useRef(false);
 
   const playAlert = useCallback(() => {
+    // Prevent multiple alerts
+    if (hasAlertedRef.current) return;
+    hasAlertedRef.current = true;
+
     // Trigger vibration
     if (vibrationEnabled && 'vibrate' in navigator) {
       try {
@@ -54,33 +66,84 @@ export function useRestTimer(
     // For now, vibration provides sufficient feedback
   }, [vibrationEnabled]);
 
+  // Calculate remaining time from end timestamp
+  const calculateTimeRemaining = useCallback(() => {
+    if (!endTimeRef.current) return 0;
+    const remaining = Math.ceil((endTimeRef.current - Date.now()) / 1000);
+    return Math.max(0, remaining);
+  }, []);
+
   useEffect(() => {
     if (!isRunning || isPaused) {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       return;
     }
 
+    // Update immediately when starting/resuming
+    const remaining = calculateTimeRemaining();
+    setTimeRemaining(remaining);
+
+    // Check completion
+    if (remaining <= 0) {
+      setIsRunning(false);
+      setIsComplete(true);
+      playAlert();
+      return;
+    }
+
+    // Use shorter interval (250ms) to catch up quickly after screen wake
     intervalRef.current = window.setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
-          setIsComplete(true);
-          playAlert();
-          return 0;
+      const remaining = calculateTimeRemaining();
+      setTimeRemaining(remaining);
+
+      if (remaining <= 0) {
+        setIsRunning(false);
+        setIsComplete(true);
+        playAlert();
+        if (intervalRef.current) {
+          window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
         }
-        return prev - 1;
-      });
-    }, 1000);
+      }
+    }, 250);
 
     return () => {
       if (intervalRef.current) {
         window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [isRunning, isPaused, playAlert]);
+  }, [isRunning, isPaused, playAlert, calculateTimeRemaining]);
+
+  // Also update on visibility change (when screen wakes up)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isRunning && !isPaused) {
+        const remaining = calculateTimeRemaining();
+        setTimeRemaining(remaining);
+
+        if (remaining <= 0) {
+          setIsRunning(false);
+          setIsComplete(true);
+          playAlert();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isRunning, isPaused, calculateTimeRemaining, playAlert]);
 
   const startTimer = useCallback(
     (seconds?: number) => {
       const duration = seconds ?? defaultRestSeconds;
+      endTimeRef.current = Date.now() + duration * 1000;
+      hasAlertedRef.current = false;
       setTimeRemaining(duration);
       setIsRunning(true);
       setIsPaused(false);
@@ -90,26 +153,41 @@ export function useRestTimer(
   );
 
   const pauseTimer = useCallback(() => {
+    // Store remaining time when pausing
+    pausedTimeRemainingRef.current = calculateTimeRemaining();
     setIsPaused(true);
-  }, []);
+  }, [calculateTimeRemaining]);
 
   const resumeTimer = useCallback(() => {
+    // Recalculate end time based on remaining time when paused
+    endTimeRef.current = Date.now() + pausedTimeRemainingRef.current * 1000;
     setIsPaused(false);
   }, []);
 
   const stopTimer = useCallback(() => {
+    endTimeRef.current = null;
     setIsRunning(false);
     setIsPaused(false);
     setTimeRemaining(0);
     setIsComplete(false);
   }, []);
 
-  const extendTimer = useCallback((seconds: number) => {
-    setTimeRemaining((prev) => prev + seconds);
-    setIsComplete(false);
-  }, []);
+  const extendTimer = useCallback(
+    (seconds: number) => {
+      if (endTimeRef.current) {
+        endTimeRef.current += seconds * 1000;
+        setTimeRemaining(calculateTimeRemaining());
+      } else {
+        setTimeRemaining((prev) => prev + seconds);
+      }
+      setIsComplete(false);
+      hasAlertedRef.current = false;
+    },
+    [calculateTimeRemaining]
+  );
 
   const resetTimer = useCallback(() => {
+    endTimeRef.current = null;
     setTimeRemaining(defaultRestSeconds);
     setIsRunning(false);
     setIsPaused(false);
