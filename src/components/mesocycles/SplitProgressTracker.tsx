@@ -4,8 +4,11 @@
  */
 
 import { useEffect, useState } from 'react';
-import { getSplitCompletionStatus } from '../../db/service';
-import type { MesocycleSplitDay, Mesocycle } from '../../types/models';
+import {
+  getSplitCompletionStatus,
+  recoverActiveWorkout,
+} from '../../db/service';
+import type { MesocycleSplitDay, Mesocycle, Workout } from '../../types/models';
 import './SplitProgressTracker.css';
 
 interface SplitCompletionInfo {
@@ -17,14 +20,17 @@ interface SplitCompletionInfo {
 interface SplitProgressTrackerProps {
   mesocycle: Mesocycle;
   onStartWorkout?: (splitDayId: string) => void;
+  onResumeWorkout?: () => void;
 }
 
 export default function SplitProgressTracker({
   mesocycle,
   onStartWorkout,
+  onResumeWorkout,
 }: SplitProgressTrackerProps) {
   const [splitStatus, setSplitStatus] = useState<SplitCompletionInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
 
   useEffect(() => {
     async function loadSplitStatus() {
@@ -32,6 +38,10 @@ export default function SplitProgressTracker({
       try {
         const status = await getSplitCompletionStatus(mesocycle.id);
         setSplitStatus(status);
+
+        // Check for active workout in progress
+        const recovered = recoverActiveWorkout();
+        setActiveWorkout(recovered);
       } catch (error) {
         console.error('Failed to load split completion status:', error);
       } finally {
@@ -100,6 +110,29 @@ export default function SplitProgressTracker({
         </div>
         <span className="progress-label">{Math.round(progress)}%</span>
       </div>
+
+      {/* Active Workout Resume Banner */}
+      {activeWorkout && !activeWorkout.completed && onResumeWorkout && (
+        <div className="active-workout-banner">
+          <div className="active-workout-info">
+            <span className="active-workout-icon">🏋️</span>
+            <div className="active-workout-text">
+              <strong>Workout in Progress</strong>
+              <span className="active-workout-details">
+                {activeWorkout.exercises.length} exercise
+                {activeWorkout.exercises.length !== 1 ? 's' : ''} • Started{' '}
+                {formatDate(activeWorkout.date)}
+              </span>
+            </div>
+          </div>
+          <button
+            className="btn btn-primary resume-workout-btn"
+            onClick={onResumeWorkout}
+          >
+            Resume Workout
+          </button>
+        </div>
+      )}
 
       {/* This Week's Progress */}
       <div className="week-progress-section">

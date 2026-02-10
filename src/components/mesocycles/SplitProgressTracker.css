@@ -265,3 +265,82 @@
     padding: 1rem;
   }
 }
+
+/* Active Workout Resume Banner */
+.active-workout-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0%,
+  100% {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    border-color: #d97706;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0);
+  }
+}
+
+.active-workout-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.active-workout-icon {
+  font-size: 1.5rem;
+}
+
+.active-workout-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.active-workout-text strong {
+  font-size: 1rem;
+  color: #92400e;
+}
+
+.active-workout-details {
+  font-size: 0.875rem;
+  color: #a16207;
+}
+
+.resume-workout-btn {
+  flex-shrink: 0;
+  background: #f59e0b !important;
+  border-color: #d97706 !important;
+}
+
+.resume-workout-btn:hover {
+  background: #d97706 !important;
+}
+
+@media (max-width: 640px) {
+  .active-workout-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .active-workout-info {
+    justify-content: center;
+  }
+
+  .resume-workout-btn {
+    width: 100%;
+  }
+}

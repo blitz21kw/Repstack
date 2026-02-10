@@ -125,6 +125,13 @@ export default function MesocycleDashboard({
     }
   };
 
+  const handleResumeWorkout = () => {
+    // Simply navigate to workout page - the useWorkoutSession hook will recover the active workout
+    if (onNavigate) {
+      onNavigate('workout');
+    }
+  };
+
   return (
     <div className="mesocycle-dashboard">
       <div className="dashboard-header">
@@ -144,6 +151,7 @@ export default function MesocycleDashboard({
         <SplitProgressTracker
           mesocycle={activeMesocycle}
           onStartWorkout={handleStartWorkout}
+          onResumeWorkout={handleResumeWorkout}
         />
       )}
 
