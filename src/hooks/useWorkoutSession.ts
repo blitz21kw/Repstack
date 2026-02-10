@@ -244,8 +244,6 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
       } catch (error) {
         // On error, keep the workout in localStorage so it can be recovered
         console.error('Failed to save workout to database:', error);
-        // Re-enable auto-save by setting isActive to false and back to true
-        // This will trigger the useEffect to restart the interval
         throw error;
       }
     },

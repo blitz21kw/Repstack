@@ -765,14 +765,12 @@ describe('Workout Recovery Functions', () => {
 
   describe('recoverActiveWorkout', () => {
     it('should return null when no activeWorkout in localStorage', () => {
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
     });
 
     it('should return null and clear localStorage when JSON is malformed', () => {
       localStorage.setItem('activeWorkout', 'invalid-json{');
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
       expect(localStorage.getItem('activeWorkout')).toBeNull();
@@ -780,7 +778,6 @@ describe('Workout Recovery Functions', () => {
 
     it('should return null and clear localStorage when JSON is not an object (null)', () => {
       localStorage.setItem('activeWorkout', 'null');
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
       expect(localStorage.getItem('activeWorkout')).toBeNull();
@@ -788,7 +785,6 @@ describe('Workout Recovery Functions', () => {
 
     it('should return null and clear localStorage when JSON is not an object (string)', () => {
       localStorage.setItem('activeWorkout', '"just a string"');
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
       expect(localStorage.getItem('activeWorkout')).toBeNull();
@@ -796,7 +792,6 @@ describe('Workout Recovery Functions', () => {
 
     it('should return null and clear localStorage when JSON is not an object (number)', () => {
       localStorage.setItem('activeWorkout', '42');
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
       expect(localStorage.getItem('activeWorkout')).toBeNull();
@@ -804,7 +799,6 @@ describe('Workout Recovery Functions', () => {
 
     it('should return null and clear localStorage when JSON is not an object (array)', () => {
       localStorage.setItem('activeWorkout', '[]');
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
       expect(localStorage.getItem('activeWorkout')).toBeNull();
@@ -820,7 +814,6 @@ describe('Workout Recovery Functions', () => {
         updatedAt: new Date().toISOString(),
       };
       localStorage.setItem('activeWorkout', JSON.stringify(completedWorkout));
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
       expect(result).toBeNull();
       expect(localStorage.getItem('activeWorkout')).toBeNull();
@@ -837,7 +830,6 @@ describe('Workout Recovery Functions', () => {
         updatedAt: now.toISOString(),
       };
       localStorage.setItem('activeWorkout', JSON.stringify(incompleteWorkout));
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
 
       expect(result).not.toBeNull();
@@ -862,7 +854,6 @@ describe('Workout Recovery Functions', () => {
         updatedAt: now.toISOString(),
       };
       localStorage.setItem('activeWorkout', JSON.stringify(incompleteWorkout));
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
 
       expect(result?.date).toBeInstanceOf(Date);
@@ -880,7 +871,6 @@ describe('Workout Recovery Functions', () => {
         updatedAt: dateWithoutMs,
       };
       localStorage.setItem('activeWorkout', JSON.stringify(incompleteWorkout));
-      // Using imported recoverActiveWorkout
       const result = recoverActiveWorkout();
 
       expect(result?.date).toBeInstanceOf(Date);
@@ -890,7 +880,6 @@ describe('Workout Recovery Functions', () => {
 
   describe('autoSaveWorkout', () => {
     it('should save workout to localStorage', () => {
-      // Using imported autoSaveWorkout
       const workout = {
         id: 'workout-1',
         date: new Date(),
@@ -910,7 +899,6 @@ describe('Workout Recovery Functions', () => {
     });
 
     it('should not throw on localStorage errors', () => {
-      // Using imported autoSaveWorkout
       const workout = {
         id: 'workout-1',
         date: new Date(),
@@ -936,7 +924,6 @@ describe('Workout Recovery Functions', () => {
 
   describe('clearAutoSavedWorkout', () => {
     it('should remove activeWorkout from localStorage', () => {
-      // Using imported clearAutoSavedWorkout
       localStorage.setItem('activeWorkout', 'some-data');
       expect(localStorage.getItem('activeWorkout')).not.toBeNull();
 
@@ -945,7 +932,6 @@ describe('Workout Recovery Functions', () => {
     });
 
     it('should not throw when activeWorkout does not exist', () => {
-      // Using imported clearAutoSavedWorkout
       expect(() => clearAutoSavedWorkout()).not.toThrow();
     });
   });
