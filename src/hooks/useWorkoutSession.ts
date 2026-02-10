@@ -64,12 +64,16 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
 
   // Auto-save active workout
   useEffect(() => {
-    if (!workout || !isActive) {
+    // Only auto-save if workout is active and not completed
+    if (!workout || !isActive || workout.completed) {
       return;
     }
 
     const save = () => {
-      autoSaveWorkout(workout);
+      // Double-check before saving
+      if (workout && isActive && !workout.completed) {
+        autoSaveWorkout(workout);
+      }
     };
 
     // Save immediately
@@ -180,6 +184,9 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
     async (feedback?: WorkoutFeedback) => {
       if (!workout) return;
 
+      // Clear auto-saved data FIRST to prevent any race conditions
+      clearAutoSavedWorkout();
+
       const duration = Math.round(
         (new Date().getTime() - workout.date.getTime()) / 60000
       ); // minutes
@@ -209,9 +216,6 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
         // Update existing workout
         await updateWorkout(workout.id, completedWorkout);
       }
-
-      // Clear auto-saved data
-      clearAutoSavedWorkout();
 
       // Reset state
       setWorkout(null);

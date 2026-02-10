@@ -605,6 +605,7 @@ export async function autoSaveWorkout(
 
 /**
  * Recover an active workout from localStorage
+ * Only returns incomplete workouts - completed workouts are not recovered
  */
 export function recoverActiveWorkout():
   | import('../types/models').Workout
@@ -625,6 +626,12 @@ export function recoverActiveWorkout():
       }
       return value;
     });
+
+    // Don't recover completed workouts - they should be cleared
+    if (workout.completed) {
+      localStorage.removeItem('activeWorkout');
+      return null;
+    }
 
     return workout;
   } catch (error) {
