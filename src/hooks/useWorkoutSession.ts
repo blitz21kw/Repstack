@@ -62,14 +62,31 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const autoSaveTimerRef = useRef<number | null>(null);
 
+  // Use refs to track current state for auto-save to avoid closure issues
+  const workoutRef = useRef<Workout | null>(workout);
+  const isActiveRef = useRef<boolean>(isActive);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    workoutRef.current = workout;
+    isActiveRef.current = isActive;
+  }, [workout, isActive]);
+
   // Auto-save active workout
   useEffect(() => {
-    if (!workout || !isActive) {
+    // Only auto-save if workout is active and not completed
+    if (!workout || !isActive || workout.completed) {
       return;
     }
 
     const save = () => {
-      autoSaveWorkout(workout);
+      // Read from refs to get current state, not closure-captured values
+      const currentWorkout = workoutRef.current;
+      const currentIsActive = isActiveRef.current;
+
+      if (currentWorkout && currentIsActive && !currentWorkout.completed) {
+        autoSaveWorkout(currentWorkout);
+      }
     };
 
     // Save immediately
@@ -180,6 +197,12 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
     async (feedback?: WorkoutFeedback) => {
       if (!workout) return;
 
+      // Stop auto-save interval immediately to prevent race conditions
+      if (autoSaveTimerRef.current) {
+        window.clearInterval(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+
       const duration = Math.round(
         (new Date().getTime() - workout.date.getTime()) / 60000
       ); // minutes
@@ -192,37 +215,49 @@ export function useWorkoutSession(): UseWorkoutSessionReturn {
         updatedAt: new Date(),
       };
 
-      // Save to database
-      if (workout.id.startsWith('temp-workout-')) {
-        // Create new workout
-        const id = await createWorkout({
-          date: completedWorkout.date,
-          splitDayId: completedWorkout.splitDayId,
-          exercises: completedWorkout.exercises,
-          notes: completedWorkout.notes,
-          completed: true,
-          duration,
-          feedback: completedWorkout.feedback,
-        });
-        completedWorkout.id = id;
-      } else {
-        // Update existing workout
-        await updateWorkout(workout.id, completedWorkout);
+      try {
+        // Save to database
+        if (workout.id.startsWith('temp-workout-')) {
+          // Create new workout
+          const id = await createWorkout({
+            date: completedWorkout.date,
+            splitDayId: completedWorkout.splitDayId,
+            exercises: completedWorkout.exercises,
+            notes: completedWorkout.notes,
+            completed: true,
+            duration,
+            feedback: completedWorkout.feedback,
+          });
+          completedWorkout.id = id;
+        } else {
+          // Update existing workout
+          await updateWorkout(workout.id, completedWorkout);
+        }
+
+        // Only clear localStorage after successful DB save
+        clearAutoSavedWorkout();
+
+        // Reset state
+        setWorkout(null);
+        setIsActive(false);
+        setCurrentExerciseIndex(0);
+      } catch (error) {
+        // On error, keep the workout in localStorage so it can be recovered
+        console.error('Failed to save workout to database:', error);
+        throw error;
       }
-
-      // Clear auto-saved data
-      clearAutoSavedWorkout();
-
-      // Reset state
-      setWorkout(null);
-      setIsActive(false);
-      setCurrentExerciseIndex(0);
     },
     [workout]
   );
 
   const cancelWorkout = useCallback(() => {
     if (!workout) return;
+
+    // Stop auto-save interval immediately
+    if (autoSaveTimerRef.current) {
+      window.clearInterval(autoSaveTimerRef.current);
+      autoSaveTimerRef.current = null;
+    }
 
     // Clear auto-saved data
     clearAutoSavedWorkout();

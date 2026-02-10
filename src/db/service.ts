@@ -605,10 +605,9 @@ export async function autoSaveWorkout(
 
 /**
  * Recover an active workout from localStorage
+ * Only returns incomplete workouts - completed workouts are not recovered
  */
-export function recoverActiveWorkout():
-  | import('../types/models').Workout
-  | null {
+export function recoverActiveWorkout(): Workout | null {
   try {
     const saved = localStorage.getItem('activeWorkout');
     if (!saved) {
@@ -626,9 +625,23 @@ export function recoverActiveWorkout():
       return value;
     });
 
-    return workout;
+    // Validate that we have a non-null object (but not an array)
+    if (!workout || typeof workout !== 'object' || Array.isArray(workout)) {
+      localStorage.removeItem('activeWorkout');
+      return null;
+    }
+
+    // Don't recover completed workouts - they should be cleared
+    if ((workout as Workout).completed) {
+      localStorage.removeItem('activeWorkout');
+      return null;
+    }
+
+    return workout as Workout;
   } catch (error) {
     console.error('Failed to recover active workout:', error);
+    // Clear corrupted data
+    localStorage.removeItem('activeWorkout');
     return null;
   }
 }
