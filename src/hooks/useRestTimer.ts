@@ -82,20 +82,9 @@ export function useRestTimer(
       return;
     }
 
-    // Update immediately when starting/resuming
-    const remaining = calculateTimeRemaining();
-    setTimeRemaining(remaining);
-
-    // Check completion
-    if (remaining <= 0) {
-      setIsRunning(false);
-      setIsComplete(true);
-      playAlert();
-      return;
-    }
-
     // Use shorter interval (250ms) to catch up quickly after screen wake
-    intervalRef.current = window.setInterval(() => {
+    // First tick happens immediately (0ms delay), then every 250ms
+    const tick = () => {
       const remaining = calculateTimeRemaining();
       setTimeRemaining(remaining);
 
@@ -108,9 +97,14 @@ export function useRestTimer(
           intervalRef.current = null;
         }
       }
-    }, 250);
+    };
+
+    // Schedule first update for next tick to avoid synchronous setState in effect
+    const immediateId = window.setTimeout(tick, 0);
+    intervalRef.current = window.setInterval(tick, 250);
 
     return () => {
+      window.clearTimeout(immediateId);
       if (intervalRef.current) {
         window.clearInterval(intervalRef.current);
         intervalRef.current = null;
