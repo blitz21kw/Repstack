@@ -24,6 +24,9 @@ import {
   getMesocycle,
   updateMesocycle,
   deleteMesocycle,
+  recoverActiveWorkout,
+  autoSaveWorkout,
+  clearAutoSavedWorkout,
 } from '../db/service';
 
 describe('Database Service - User Profiles', () => {
@@ -747,5 +750,189 @@ describe('Database Service - Data Flow Integration', () => {
 
     const mesocycle = await getMesocycle(mesocycleId);
     expect(mesocycle?.status).toBe('active');
+  });
+});
+
+describe('Workout Recovery Functions', () => {
+  beforeEach(() => {
+    // Clear localStorage before each test
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  describe('recoverActiveWorkout', () => {
+    it('should return null when no activeWorkout in localStorage', () => {
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+    });
+
+    it('should return null and clear localStorage when JSON is malformed', () => {
+      localStorage.setItem('activeWorkout', 'invalid-json{');
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should return null and clear localStorage when JSON is not an object (null)', () => {
+      localStorage.setItem('activeWorkout', 'null');
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should return null and clear localStorage when JSON is not an object (string)', () => {
+      localStorage.setItem('activeWorkout', '"just a string"');
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should return null and clear localStorage when JSON is not an object (number)', () => {
+      localStorage.setItem('activeWorkout', '42');
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should return null and clear localStorage when JSON is not an object (array)', () => {
+      localStorage.setItem('activeWorkout', '[]');
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should return null and clear localStorage when workout is completed', () => {
+      const completedWorkout = {
+        id: 'workout-1',
+        date: new Date().toISOString(),
+        exercises: [],
+        completed: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem('activeWorkout', JSON.stringify(completedWorkout));
+      const result = recoverActiveWorkout();
+      expect(result).toBeNull();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should return incomplete workout with revived Date objects', () => {
+      const now = new Date();
+      const incompleteWorkout = {
+        id: 'workout-1',
+        date: now.toISOString(),
+        exercises: [],
+        completed: false,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      };
+      localStorage.setItem('activeWorkout', JSON.stringify(incompleteWorkout));
+      const result = recoverActiveWorkout();
+
+      expect(result).not.toBeNull();
+      expect(result?.id).toBe('workout-1');
+      expect(result?.completed).toBe(false);
+      // Check that dates were revived as Date objects
+      expect(result?.date).toBeInstanceOf(Date);
+      expect(result?.createdAt).toBeInstanceOf(Date);
+      expect(result?.updatedAt).toBeInstanceOf(Date);
+      // localStorage should NOT be cleared for incomplete workouts
+      expect(localStorage.getItem('activeWorkout')).not.toBeNull();
+    });
+
+    it('should handle ISO date strings with milliseconds', () => {
+      const now = new Date();
+      const incompleteWorkout = {
+        id: 'workout-1',
+        date: now.toISOString(), // Format: 2026-02-10T09:02:02.270Z
+        exercises: [],
+        completed: false,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      };
+      localStorage.setItem('activeWorkout', JSON.stringify(incompleteWorkout));
+      const result = recoverActiveWorkout();
+
+      expect(result?.date).toBeInstanceOf(Date);
+      expect(result?.date.getTime()).toBeCloseTo(now.getTime(), -1);
+    });
+
+    it('should handle ISO date strings without milliseconds', () => {
+      const dateWithoutMs = '2026-02-10T09:02:02Z';
+      const incompleteWorkout = {
+        id: 'workout-1',
+        date: dateWithoutMs,
+        exercises: [],
+        completed: false,
+        createdAt: dateWithoutMs,
+        updatedAt: dateWithoutMs,
+      };
+      localStorage.setItem('activeWorkout', JSON.stringify(incompleteWorkout));
+      const result = recoverActiveWorkout();
+
+      expect(result?.date).toBeInstanceOf(Date);
+      expect(result?.date.toISOString()).toBe('2026-02-10T09:02:02.000Z');
+    });
+  });
+
+  describe('autoSaveWorkout', () => {
+    it('should save workout to localStorage', () => {
+      const workout = {
+        id: 'workout-1',
+        date: new Date(),
+        exercises: [],
+        completed: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      autoSaveWorkout(workout);
+      const saved = localStorage.getItem('activeWorkout');
+      expect(saved).not.toBeNull();
+
+      const parsed = JSON.parse(saved!);
+      expect(parsed.id).toBe('workout-1');
+      expect(parsed.completed).toBe(false);
+    });
+
+    it('should not throw on localStorage errors', () => {
+      const workout = {
+        id: 'workout-1',
+        date: new Date(),
+        exercises: [],
+        completed: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // Mock localStorage.setItem to throw
+      const originalSetItem = localStorage.setItem;
+      localStorage.setItem = () => {
+        throw new Error('localStorage is full');
+      };
+
+      // Should not throw
+      expect(() => autoSaveWorkout(workout)).not.toThrow();
+
+      // Restore
+      localStorage.setItem = originalSetItem;
+    });
+  });
+
+  describe('clearAutoSavedWorkout', () => {
+    it('should remove activeWorkout from localStorage', () => {
+      localStorage.setItem('activeWorkout', 'some-data');
+      expect(localStorage.getItem('activeWorkout')).not.toBeNull();
+
+      clearAutoSavedWorkout();
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
+    });
+
+    it('should not throw when activeWorkout does not exist', () => {
+      expect(() => clearAutoSavedWorkout()).not.toThrow();
+    });
   });
 });
