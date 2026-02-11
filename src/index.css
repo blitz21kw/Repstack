@@ -91,26 +91,16 @@ body {
   }
 }
 
-html {
-  /* Already included at top */
-}
-
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);
-  /* Prevent horizontal overflow */
-  overflow-x: hidden;
-  max-width: 100%;
 }
 
 #root {
   min-height: 100vh;
-  /* Prevent horizontal overflow */
-  overflow-x: hidden;
-  max-width: 100%;
 }
 
 h1,
