@@ -198,6 +198,16 @@
   -webkit-tap-highlight-color: transparent;
   font-family: inherit;
   width: 100%;
+  /* Reset default button styles so clickable cards render consistently */
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-align: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
 }
 
 .split-card.clickable:hover {

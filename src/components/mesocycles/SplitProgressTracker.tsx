@@ -147,12 +147,20 @@ export default function SplitProgressTracker({
               activeWorkout.splitDayId === info.splitDay.id;
 
             const handleCardClick = () => {
-              if (isInProgress && onResumeWorkout) {
-                // Resume the active workout for this split
-                onResumeWorkout();
+              if (isInProgress) {
+                if (onResumeWorkout) {
+                  onResumeWorkout();
+                } else {
+                  console.warn(
+                    'Resume workout callback not provided - workout cannot be resumed'
+                  );
+                }
               } else if (onStartWorkout) {
-                // Start (or re-do) this split day
                 onStartWorkout(info.splitDay.id);
+              } else {
+                console.warn(
+                  'Start workout callback not provided - workout cannot be started'
+                );
               }
             };
 
@@ -206,10 +214,7 @@ export default function SplitProgressTracker({
           <div className="completion-message">
             <span className="completion-icon">🎉</span>
             <p className="completion-text">All done this week!</p>
-            <p className="completion-subtext">
-              Tap any split above to repeat it or start next week&apos;s
-              training
-            </p>
+            <p className="completion-subtext">Tap any split above to redo it</p>
           </div>
         )}
       </div>
