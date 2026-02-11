@@ -151,12 +151,16 @@ export default function SplitProgressTracker({
                 if (onResumeWorkout) {
                   onResumeWorkout();
                 } else {
-                  console.warn('Resume workout callback not provided');
+                  console.warn(
+                    'Resume workout callback not provided - workout cannot be resumed'
+                  );
                 }
               } else if (onStartWorkout) {
                 onStartWorkout(info.splitDay.id);
               } else {
-                console.warn('Start workout callback not provided');
+                console.warn(
+                  'Start workout callback not provided - workout cannot be started'
+                );
               }
             };
 
