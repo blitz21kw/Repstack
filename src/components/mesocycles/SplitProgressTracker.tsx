@@ -141,16 +141,41 @@ export default function SplitProgressTracker({
         <div className="split-cards">
           {splitStatus.map((info) => {
             const isNext = !allCompleted && info.splitDay.id === nextSplit?.id;
+            const isInProgress =
+              activeWorkout &&
+              !activeWorkout.completed &&
+              activeWorkout.splitDayId === info.splitDay.id;
+
+            const handleCardClick = () => {
+              if (isInProgress && onResumeWorkout) {
+                // Resume the active workout for this split
+                onResumeWorkout();
+              } else if (onStartWorkout) {
+                // Start (or re-do) this split day
+                onStartWorkout(info.splitDay.id);
+              }
+            };
 
             return (
-              <div
+              <button
+                type="button"
                 key={info.splitDay.id}
-                className={`split-card ${info.completed ? 'completed' : ''} ${isNext ? 'next' : ''}`}
+                className={`split-card clickable ${info.completed ? 'completed' : ''} ${isNext ? 'next' : ''} ${isInProgress ? 'in-progress' : ''}`}
+                onClick={handleCardClick}
+                aria-label={`${
+                  isInProgress ? 'Resume' : info.completed ? 'Redo' : 'Start'
+                } ${info.splitDay.name}`}
               >
                 <div className="split-card-header">
                   <span className="split-name">{info.splitDay.name}</span>
                   <span className="split-status">
-                    {info.completed ? '✓' : isNext ? '★ Next' : ''}
+                    {isInProgress
+                      ? '🏋️ In Progress'
+                      : info.completed
+                        ? '✓'
+                        : isNext
+                          ? '★ Next'
+                          : ''}
                   </span>
                 </div>
                 {info.completedDate && (
@@ -164,28 +189,29 @@ export default function SplitProgressTracker({
                     {info.splitDay.exercises.length !== 1 ? 's' : ''}
                   </div>
                 )}
-              </div>
+                <div className="split-card-action">
+                  {isInProgress
+                    ? 'Tap to resume'
+                    : info.completed
+                      ? 'Tap to redo'
+                      : 'Tap to start'}
+                </div>
+              </button>
             );
           })}
         </div>
 
-        {/* Action Button */}
-        {allCompleted ? (
+        {/* Completion Message */}
+        {allCompleted && (
           <div className="completion-message">
             <span className="completion-icon">🎉</span>
             <p className="completion-text">All done this week!</p>
             <p className="completion-subtext">
-              You can repeat splits or start next week&apos;s training
+              Tap any split above to repeat it or start next week&apos;s
+              training
             </p>
           </div>
-        ) : nextSplit && onStartWorkout ? (
-          <button
-            className="btn btn-primary start-workout-btn"
-            onClick={() => onStartWorkout(nextSplit.id)}
-          >
-            Start Next Workout
-          </button>
-        ) : null}
+        )}
       </div>
 
       {/* Deload Week Message */}
