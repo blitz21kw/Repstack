@@ -1,5 +1,8 @@
 .app-container {
   max-width: 100%;
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .loading-state {

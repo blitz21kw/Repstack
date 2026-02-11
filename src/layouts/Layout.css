@@ -4,6 +4,9 @@
   min-height: 100vh;
   /* Add padding for mobile bottom navigation */
   padding-bottom: env(safe-area-inset-bottom);
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .header {
@@ -11,12 +14,18 @@
   color: white;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .container {
   max-width: var(--container-max-width, 1200px);
   margin: 0 auto;
   padding: 0 var(--container-padding, 1rem);
+  /* Ensure container doesn't cause horizontal overflow */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header .container {
@@ -187,5 +196,39 @@
 
   .nav-link {
     font-size: 1.0625rem;
+  }
+}
+
+/* Extra small screens (Galaxy S24, iPhone SE, etc.) */
+@media (max-width: 400px) {
+  :root {
+    --container-padding: 0.75rem;
+  }
+
+  .header {
+    padding: 0.75rem 0;
+  }
+
+  .logo {
+    font-size: 1.25rem;
+  }
+
+  .nav-mobile {
+    padding: 0.375rem 0;
+    padding-bottom: calc(0.375rem + env(safe-area-inset-bottom));
+  }
+
+  .nav-mobile-link {
+    min-width: 40px;
+    padding: 0.125rem 0.25rem;
+    max-width: 70px;
+  }
+
+  .nav-mobile-icon {
+    font-size: 1.25rem;
+  }
+
+  .nav-mobile-label {
+    font-size: 0.5625rem;
   }
 }
