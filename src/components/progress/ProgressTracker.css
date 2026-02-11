@@ -103,3 +103,19 @@
     font-size: 0.85rem;
   }
 }
+
+/* Extra small screens */
+@media (max-width: 400px) {
+  .progress-header h1 {
+    font-size: 1.125rem;
+  }
+
+  .progress-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+}
