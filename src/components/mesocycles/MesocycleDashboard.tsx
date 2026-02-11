@@ -117,6 +117,8 @@ export default function MesocycleDashboard({
   };
 
   const handleStartWorkout = (splitDayId: string) => {
+    // Clear any stale active workout so the new split takes priority
+    localStorage.removeItem('activeWorkout');
     // Store the selected split day ID in localStorage for the workout session to pick up
     localStorage.setItem('selectedSplitDayId', splitDayId);
     // Navigate to workout page

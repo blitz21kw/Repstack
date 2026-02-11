@@ -3,7 +3,7 @@
  * Handles active workout logging and tracking
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useWorkoutSession } from '../../hooks/useWorkoutSession';
 import {
   useExercises,
@@ -103,11 +103,25 @@ export default function WorkoutSession({ onNavigate }: WorkoutSessionProps) {
   }, [activeMesocycle, completedWorkouts]);
 
   // Auto-start workout if coming from mesocycle dashboard with a selected split
+  const autoStartProcessedRef = useRef(false);
   useEffect(() => {
     const selectedSplitDayId = localStorage.getItem('selectedSplitDayId');
-    if (selectedSplitDayId && activeMesocycle && !isActive) {
+    if (
+      selectedSplitDayId &&
+      activeMesocycle &&
+      !autoStartProcessedRef.current
+    ) {
+      // Mark as processed to prevent re-execution
+      autoStartProcessedRef.current = true;
       // Clear immediately to prevent re-triggering
       localStorage.removeItem('selectedSplitDayId');
+
+      // If there's already an active (but stale) workout, cancel it first
+      // so we start fresh with the user's explicitly chosen split
+      if (isActive) {
+        cancelWorkout();
+      }
+
       // Auto-start the workout with the selected split
       startWorkoutFromSplit(activeMesocycle.id, selectedSplitDayId).catch(
         (error) => {
@@ -116,7 +130,13 @@ export default function WorkoutSession({ onNavigate }: WorkoutSessionProps) {
         }
       );
     }
-  }, [activeMesocycle, isActive, startWorkoutFromSplit, showToast]);
+  }, [
+    activeMesocycle,
+    isActive,
+    startWorkoutFromSplit,
+    cancelWorkout,
+    showToast,
+  ]);
 
   // Get all unique muscle groups from workout exercises
   const workoutMuscleGroups = useMemo(() => {

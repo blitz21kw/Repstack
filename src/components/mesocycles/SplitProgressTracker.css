@@ -191,7 +191,70 @@
   margin: 0;
 }
 
-/* Start Workout Button */
+/* Clickable Split Cards */
+.split-card.clickable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+  width: 100%;
+  /* Reset default button styles so clickable cards render consistently */
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-align: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.split-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.split-card.clickable:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.split-card.clickable:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+.split-card.in-progress {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.split-card.in-progress .split-status {
+  color: #d97706;
+  font-size: 0.875rem;
+}
+
+.split-card-action {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.split-card.next .split-card-action {
+  color: #3b82f6;
+}
+
+.split-card.in-progress .split-card-action {
+  color: #d97706;
+}
+
+.split-card.completed .split-card-action {
+  color: #10b981;
+}
+
+/* Start Workout Button (legacy, kept for compatibility) */
 .start-workout-btn {
   width: 100%;
   margin-top: 1rem;
