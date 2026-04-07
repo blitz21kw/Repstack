@@ -3,7 +3,9 @@
  */
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { Exercise, MuscleGroup } from '../../types/models';
+import ExerciseForm from '../exercises/ExerciseForm';
 import './ExerciseSelector.css';
 
 interface ExerciseSelectorProps {
@@ -11,6 +13,9 @@ interface ExerciseSelectorProps {
   selectedExerciseIds: string[];
   onSelect: (exerciseId: string) => void;
   onClose: () => void;
+  onCreateExercise?: (
+    exercise: Omit<Exercise, 'id' | 'createdAt'>
+  ) => Promise<string>;
 }
 
 // Define muscle group categories for filtering
@@ -32,6 +37,7 @@ export default function ExerciseSelector({
   selectedExerciseIds,
   onSelect,
   onClose,
+  onCreateExercise,
 }: ExerciseSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<
@@ -39,6 +45,7 @@ export default function ExerciseSelector({
   >('all');
   const [filterMuscleGroup, setFilterMuscleGroup] =
     useState<MuscleGroupFilter>('all');
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const filteredExercises = exercises.filter((exercise) => {
     const matchesSearch = exercise.name
@@ -129,6 +136,15 @@ export default function ExerciseSelector({
     onClose();
   };
 
+  const handleCreateExerciseSave = async (
+    exerciseData: Omit<Exercise, 'id' | 'createdAt'>
+  ) => {
+    if (!onCreateExercise) return;
+    const newId = await onCreateExercise(exerciseData);
+    setShowCreateForm(false);
+    onSelect(newId);
+  };
+
   // Lock body scroll when modal is open
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -217,6 +233,26 @@ export default function ExerciseSelector({
           </div>
 
           <div className="exercise-list">
+            {onCreateExercise && (
+              <button
+                type="button"
+                onClick={() => setShowCreateForm(true)}
+                className="exercise-item create-exercise-btn"
+              >
+                <div className="exercise-item-header">
+                  <span className="exercise-item-icon">➕</span>
+                  <span className="exercise-item-name">
+                    Create New Exercise
+                  </span>
+                </div>
+                <div className="exercise-item-muscles">
+                  <span className="muscle-tag-small create-hint">
+                    Add a custom exercise to your library
+                  </span>
+                </div>
+              </button>
+            )}
+
             {filteredExercises.length === 0 && (
               <p className="no-results">
                 No exercises found. Try adjusting your search or filters.
@@ -246,6 +282,19 @@ export default function ExerciseSelector({
             ))}
           </div>
         </div>
+
+        {showCreateForm &&
+          onCreateExercise &&
+          createPortal(
+            <div style={{ position: 'relative', zIndex: 1200 }}>
+              <ExerciseForm
+                isOpen={showCreateForm}
+                onSave={handleCreateExerciseSave}
+                onCancel={() => setShowCreateForm(false)}
+              />
+            </div>,
+            document.body
+          )}
       </div>
     </div>
   );
