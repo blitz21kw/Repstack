@@ -268,6 +268,12 @@
   font-style: italic;
 }
 
+/* Exercise Form Portal - renders above ExerciseSelector (z-index: 1100) */
+.exercise-form-portal {
+  position: relative;
+  z-index: 1200;
+}
+
 /* Mobile Responsive */
 @media (max-width: 640px) {
   .modal-overlay {

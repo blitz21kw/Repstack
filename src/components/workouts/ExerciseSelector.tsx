@@ -286,7 +286,7 @@ export default function ExerciseSelector({
         {showCreateForm &&
           onCreateExercise &&
           createPortal(
-            <div style={{ position: 'relative', zIndex: 1200 }}>
+            <div className="exercise-form-portal">
               <ExerciseForm
                 isOpen={showCreateForm}
                 onSave={handleCreateExerciseSave}
