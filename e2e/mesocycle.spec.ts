@@ -367,16 +367,18 @@ test.describe('Mesocycle Management', () => {
       await page.waitForTimeout(500);
 
       // Select first existing exercise (exclude "Create New Exercise" action)
-      const exerciseOptions = page.locator(
-        '.exercise-list .exercise-item:not(.create-exercise-btn)'
-      );
+      const exerciseOptions = page
+        .locator('.exercise-list .exercise-item')
+        .filter({ hasNotText: 'Create New Exercise' });
       if ((await exerciseOptions.count()) > 0) {
         await exerciseOptions.first().click();
         await page.waitForTimeout(500);
 
         // Should see configuration inputs for sets, reps, rest
         const setsInput = page
-          .locator('.split-day-editor .exercise-list .exercise-item input[type="number"]')
+          .locator('.split-day-editor .config-group')
+          .filter({ hasText: 'Sets' })
+          .locator('input[type="number"]')
           .first();
         await expect(setsInput).toBeVisible();
 
