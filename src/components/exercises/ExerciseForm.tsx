@@ -123,6 +123,7 @@ export default function ExerciseForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setError(null);
 
     if (!name.trim()) {
