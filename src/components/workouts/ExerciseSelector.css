@@ -246,6 +246,34 @@
   color: #9ca3af;
 }
 
+/* Create New Exercise Button */
+.create-exercise-btn {
+  border-style: dashed !important;
+  border-color: #3b82f6 !important;
+  background: #eff6ff !important;
+}
+
+.create-exercise-btn:hover {
+  background: #dbeafe !important;
+  border-color: #2563eb !important;
+}
+
+.create-exercise-btn .exercise-item-name {
+  color: #3b82f6;
+}
+
+.create-exercise-btn .create-hint {
+  background-color: transparent;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Exercise Form Portal - renders above ExerciseSelector (z-index: 1100) */
+.exercise-form-portal {
+  position: relative;
+  z-index: 1200;
+}
+
 /* Mobile Responsive */
 @media (max-width: 640px) {
   .modal-overlay {

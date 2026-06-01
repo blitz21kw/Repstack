@@ -10,7 +10,7 @@ import type {
 } from '../../types/models';
 import ExerciseSelector from '../workouts/ExerciseSelector';
 import { isExerciseValidForSplitDay } from '../../lib/splitUtils';
-import { getExerciseWorkoutCount } from '../../db/service';
+import { getExerciseWorkoutCount, createExercise } from '../../db/service';
 import '../common/shared-dialog.css';
 import './SplitDayEditor.css';
 
@@ -38,13 +38,15 @@ export default function SplitDayEditor({
 
   const handleAddExercise = (exerciseId: string) => {
     const exercise = exercises.find((e) => e.id === exerciseId);
-    if (!exercise) return;
 
-    // Validate muscle groups
-    if (!isExerciseValidForSplitDay(exercise.muscleGroups, splitDay.name)) {
-      alert(
-        `Warning: ${exercise.name} may not be appropriate for ${splitDay.name}. The muscle groups don't match the split focus.`
-      );
+    // Validate muscle groups (only if exercise is in the current list;
+    // a newly created exercise may not have propagated yet via useLiveQuery)
+    if (exercise) {
+      if (!isExerciseValidForSplitDay(exercise.muscleGroups, splitDay.name)) {
+        alert(
+          `Warning: ${exercise.name} may not be appropriate for ${splitDay.name}. The muscle groups don't match the split focus.`
+        );
+      }
     }
 
     const newExercise: MesocycleExercise = {
@@ -61,6 +63,12 @@ export default function SplitDayEditor({
     });
 
     setShowExerciseSelector(false);
+  };
+
+  const handleCreateExercise = async (
+    exerciseData: Omit<Exercise, 'id' | 'createdAt'>
+  ): Promise<string> => {
+    return await createExercise(exerciseData);
   };
 
   const handleRemoveExercise = async (index: number) => {
@@ -293,6 +301,7 @@ export default function SplitDayEditor({
           selectedExerciseIds={selectedExerciseIds}
           onSelect={handleAddExercise}
           onClose={() => setShowExerciseSelector(false)}
+          onCreateExercise={handleCreateExercise}
         />
       )}
     </div>
