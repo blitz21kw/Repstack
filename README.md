@@ -14,31 +14,31 @@ Repstack is an open source alternative to commercial hypertrophy training applic
 - **Privacy-First**: Your training data stays with you - works offline
 - **Community-Driven**: Built by lifters, for lifters
 
-## ✨ Planned Features
+## ✨ Features
 
-### Phase 1: Core Training Engine
-- [ ] Personalized training program generator
-- [ ] Auto-regulation based on user feedback (pump, soreness, recovery)
-- [ ] Progressive overload tracking
-- [ ] Mesocycle management (4-6 week training blocks)
-- [ ] Deload week scheduling
-- [ ] Exercise library with user-created exercises and categories (machine, barbell, dumbbell)
+### Phase 1: Core Training Engine ✅
+- [x] Personalized training program generator
+- [x] Auto-regulation based on user feedback (pump, soreness, recovery)
+- [x] Progressive overload tracking
+- [x] Mesocycle management (4-6 week training blocks)
+- [x] Deload week scheduling
+- [x] Exercise library with user-created exercises and categories (machine, barbell, dumbbell, bodyweight, cable)
 
-### Phase 2: Enhanced Experience
-- [ ] Workout logging and history
-- [ ] Progress tracking and analytics
-- [ ] Custom exercise creation
-- [ ] Template library (1-2 programs for different splits: upper/lower, push/pull/legs, full body)
+### Phase 2: Enhanced Experience ✅
+- [x] Workout logging and history
+- [x] Progress tracking and analytics (1RM, volume, personal records)
+- [x] Custom exercise creation
+- [x] Template library (programs for upper/lower, push/pull/legs, full body splits)
+- [x] Volume landmarks and recovery indicators
 - [ ] Exercise substitution recommendations
-- [ ] Volume landmarks and recovery indicators
 
-### Phase 3: Advanced Features
-- [ ] Offline-first PWA capabilities
-- [ ] Data export/import
-- [ ] Training insights and visualizations
-- [ ] Multiple training styles (hypertrophy, strength, hybrid)
-- [ ] Equipment-based program filtering
-- [ ] Mobile and desktop responsive design
+### Phase 3: Advanced Features ✅
+- [x] Offline-first PWA capabilities
+- [x] Data export/import
+- [x] Training insights and visualizations
+- [x] Multiple training styles (hypertrophy, strength, hybrid)
+- [x] Equipment-based program filtering
+- [x] Mobile and desktop responsive design
 
 ### Future: SaaS Layer (Optional, Paid)
 - Premium coaching features
@@ -103,6 +103,10 @@ Repstack is an open source alternative to commercial hypertrophy training applic
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 - `npm run type-check` - Run TypeScript type checking
+- `npm run test` - Run unit tests with Vitest (watch mode)
+- `npm run test:run` - Run unit tests once
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run test:e2e` - Run end-to-end tests with Playwright
 
 ### PWA Features
 
@@ -143,17 +147,27 @@ Repstack/
 │   ├── apple-touch-icon.png  # iOS home screen icon
 │   └── robots.txt       # SEO robots file
 ├── src/
-│   ├── components/      # Reusable UI components
+│   ├── components/      # Feature UI components
+│   │   ├── common/      # Shared UI (toasts, dialogs)
+│   │   ├── exercises/   # Exercise library management
+│   │   ├── mesocycles/  # Mesocycle/program management
+│   │   ├── onboarding/  # First-time setup wizard
+│   │   ├── progress/    # Progress tracking & analytics
+│   │   ├── settings/    # App settings
+│   │   ├── templates/   # Pre-built training templates
+│   │   └── workouts/    # Workout session logging
 │   ├── layouts/         # Layout components
-│   ├── features/        # Feature-specific components
-│   ├── pages/           # Page components
 │   ├── hooks/           # Custom React hooks
 │   ├── db/              # IndexedDB database setup (Dexie)
-│   ├── lib/             # Utility functions
-│   ├── styles/          # Global styles
+│   ├── lib/             # Utility functions and algorithms
+│   ├── types/           # TypeScript type definitions
+│   ├── test/            # Test utilities and helpers
 │   ├── App.tsx          # Main app component
 │   ├── main.tsx         # App entry point
 │   └── index.css        # Global CSS
+├── e2e/                 # Playwright end-to-end tests
+├── docs/                # Documentation
+├── screenshots/         # App screenshots
 ├── index.html           # HTML template
 ├── vite.config.ts       # Vite configuration
 ├── tsconfig.json        # TypeScript configuration
@@ -165,12 +179,14 @@ Repstack/
 
 The app uses IndexedDB (via Dexie.js) with the following tables:
 
-- **users** - User profiles and preferences
-- **exercises** - Exercise library (user-created)
-- **workouts** - Workout logs with sets, reps, and feedback
-- **mesocycles** - Training blocks (4-6 week programs)
+- **users** - User profiles and preferences (experience level, units, theme)
+- **exercises** - Exercise library (user-created and built-in starter exercises)
+- **workouts** - Workout logs with sets, reps, and weights
+- **workoutSets** - Individual sets with reps, weight, and RIR data
+- **trainingSessions** - Auto-regulation feedback (pump, soreness, fatigue ratings)
+- **mesocycles** - Training blocks (4-6 week programs with split configuration)
 
-See `src/db/index.ts` for the complete schema.
+See `src/db/index.ts` for the complete schema and `src/types/models.ts` for TypeScript interfaces.
 
 ### Performance Targets
 
@@ -181,21 +197,31 @@ See `src/db/index.ts` for the complete schema.
 
 ## 📋 Project Status
 
-**Current Phase:** ✅ Foundation Complete → 🚀 Building Core Features
+**Current Phase:** ✅ Core Application Complete → 🚀 Refining & Expanding
 
-The project foundation is now set up with:
+The core application is fully functional with:
 - ✅ React + TypeScript + Vite
 - ✅ PWA capabilities (offline, installable)
-- ✅ IndexedDB for local storage
+- ✅ IndexedDB for local storage (Dexie.js)
 - ✅ Responsive mobile-first layout
 - ✅ Code quality tools (ESLint, Prettier)
 - ✅ Production build pipeline
+- ✅ Unit tests (Vitest) and E2E tests (Playwright)
+- ✅ Onboarding wizard for new users
+- ✅ Exercise library with starter exercises
+- ✅ Workout session logging with auto-save
+- ✅ Mesocycle planning with split configuration
+- ✅ Progress tracking with 1RM calculations and personal records
+- ✅ Auto-regulation (pump, soreness, fatigue feedback)
+- ✅ Pre-built training program templates
+- ✅ Data export/import for portability
+- ✅ Dark/light/system theme support
+- ✅ Accessibility (WCAG 2.1 AA compliance)
 
 **Next Steps:**
-- Build core training engine
-- Implement workout logging
-- Create exercise library
-- Add mesocycle management
+- Exercise substitution recommendations
+- Advanced analytics and visualizations
+- Optional cloud sync (SaaS layer)
 
 ## 🤝 Contributing
 
@@ -214,12 +240,11 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribut
 
 ## 📖 Documentation
 
-Documentation is being developed alongside the project. Check the `/docs` folder (coming soon) for:
-
-- Architecture decisions
-- API documentation
-- User guides
-- Development setup instructions
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture decisions and data flow
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/OFFLINE_FUNCTIONALITY.md](docs/OFFLINE_FUNCTIONALITY.md) - How offline mode works
+- [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) - Accessibility implementation details
+- [docs/TESTING.md](docs/TESTING.md) - Testing strategy and how to run tests
 
 ## 🎓 Learning Resources
 
@@ -241,10 +266,10 @@ This means:
 
 ## 🔮 Project Roadmap
 
-1. **Phase 1 (3 months)**: Requirements definition and architecture design
-2. **Phase 2 (3-4 months)**: Core training engine MVP
-3. **Phase 3 (2-3 months)**: PWA features and offline capability
-4. **Phase 4**: Public beta release
+1. **Phase 1 (Complete)**: Core training engine — workout logging, exercise library, mesocycle planning
+2. **Phase 2 (Complete)**: Progress tracking — analytics, 1RM calculations, personal records, templates
+3. **Phase 3 (Complete)**: PWA features — offline support, installable, data export/import
+4. **Phase 4 (In Progress)**: Polish & expand — exercise substitutions, advanced analytics, optional cloud sync
 
 ## 💬 Community & Support
 
