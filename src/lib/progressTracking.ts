@@ -300,7 +300,8 @@ function calculateStreaks(sortedWorkouts: Workout[]): {
   let currentStreak = 0;
   let longestStreak = 0;
   let tempStreak = 1;
-  let lastDate = sortedWorkouts[0].date;
+  // Work with a copy so streak normalization does not mutate the workout date.
+  let lastDate = new Date(sortedWorkouts[0].date);
   lastDate.setHours(0, 0, 0, 0);
 
   // Check if the most recent workout was today or yesterday
