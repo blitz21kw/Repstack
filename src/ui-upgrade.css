@@ -15,10 +15,10 @@
   --color-surface: #ffffff;
   --color-surface-muted: #eef0f8;
   --color-text: #1d2333;
-  --color-text-light: #667085;
+  --color-text-light: #4a5568;
   --color-border: #e2e5ef;
   --color-error: #c24153;
-  --color-success: #16806a;
+  --color-success: #0f6b59;
   --color-warning: #a66716;
   --color-info: #3f67b3;
   --color-focus: #7c3aed;
@@ -66,6 +66,7 @@ html[data-theme='dark'] {
   --color-text: #f4f5fb;
   --color-text-light: #a9afc3;
   --color-border: #30354b;
+  --color-success: #62d5b5;
   --color-primary-soft: #2d2b55;
   --color-success-soft: #173d36;
   --color-warning-soft: #493a1d;
