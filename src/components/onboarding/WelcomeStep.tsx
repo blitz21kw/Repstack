@@ -26,19 +26,27 @@ export default function WelcomeStep({ onNext, onSkip }: WelcomeStepProps) {
 
           <div className="features-list">
             <div className="feature-item">
-              <span className="feature-icon">📊</span>
+              <span className="feature-icon" aria-hidden="true">
+                📊
+              </span>
               <span>Track workouts & progress</span>
             </div>
             <div className="feature-item">
-              <span className="feature-icon">🎯</span>
+              <span className="feature-icon" aria-hidden="true">
+                🎯
+              </span>
               <span>Auto-regulate training volume</span>
             </div>
             <div className="feature-item">
-              <span className="feature-icon">📈</span>
+              <span className="feature-icon" aria-hidden="true">
+                📈
+              </span>
               <span>Structured mesocycle programs</span>
             </div>
             <div className="feature-item">
-              <span className="feature-icon">🔒</span>
+              <span className="feature-icon" aria-hidden="true">
+                🔒
+              </span>
               <span>Privacy-first & offline-ready</span>
             </div>
           </div>

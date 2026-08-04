@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import './index.css';
 import App from './App.tsx';
+import './ui-upgrade.css';
 import { initializeDatabase } from './db/index.ts';
 
 // Register service worker with auto-update

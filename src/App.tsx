@@ -318,7 +318,7 @@ function App() {
       <Layout>
         <div className="app-container">
           <div className="loading-state">
-            <p>Loading...</p>
+            <p>Loading…</p>
           </div>
         </div>
       </Layout>
@@ -339,7 +339,11 @@ function App() {
     <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
       <div className="app-container">
         <div className="status-bar">
-          <span className={`status ${isOnline ? 'online' : 'offline'}`}>
+          <span
+            className={`status ${isOnline ? 'online' : 'offline'}`}
+            role="status"
+            aria-live="polite"
+          >
             {isOnline ? '🟢 Online' : '🔴 Offline'}
           </span>
           {installPrompt && (

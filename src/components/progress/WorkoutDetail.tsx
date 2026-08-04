@@ -69,7 +69,11 @@ export default function WorkoutDetail({
       >
         <div className="modal-header">
           <h2>Workout Details</h2>
-          <button className="close-btn" onClick={onClose}>
+          <button
+            className="close-btn"
+            onClick={onClose}
+            aria-label="Close workout details"
+          >
             ✕
           </button>
         </div>

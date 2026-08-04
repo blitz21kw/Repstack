@@ -94,7 +94,7 @@ export default function Layout({
           <span className="nav-mobile-icon" aria-hidden="true">
             📊
           </span>
-          <span className="nav-mobile-label">Meso</span>
+          <span className="nav-mobile-label">Plan</span>
         </a>
         <a
           href="#workouts"
