@@ -77,7 +77,7 @@ export default function MesocycleCard({
       <div className="mesocycle-card-body">
         {/* Progress Bar */}
         <div className="progress-section">
-          <div className="progress-header">
+          <div className="mesocycle-progress-header">
             <span className="progress-label">
               Week {mesocycle.currentWeek} of {mesocycle.durationWeeks}
               {isDeloadWeek && <span className="deload-badge">🔄 Deload</span>}

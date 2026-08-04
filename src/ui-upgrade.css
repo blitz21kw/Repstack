@@ -507,6 +507,22 @@ select:focus,
     color-mix(in srgb, var(--color-primary) 16%, transparent);
 }
 
+.btn-danger-outline {
+  color: var(--color-error);
+  background: var(--color-danger-soft);
+  border: 1px solid
+    color-mix(in srgb, var(--color-error) 30%, var(--color-border));
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--color-error) 12%,
+    var(--color-danger-soft)
+  );
+  border-color: var(--color-error);
+}
+
 input[type='checkbox'],
 input[type='radio'] {
   accent-color: var(--color-primary);
@@ -1166,6 +1182,71 @@ html[data-theme='dark'] .sets-table-header {
   background: var(--color-surface-muted);
 }
 
+html[data-theme='dark'] .tracker-title,
+html[data-theme='dark'] .section-title,
+html[data-theme='dark'] .workout-history h2,
+html[data-theme='dark'] .progress-stats h2,
+html[data-theme='dark'] .progress-stats h3,
+html[data-theme='dark'] .split-name,
+html[data-theme='dark'] .mesocycle-progress-header,
+html[data-theme='dark'] .mesocycle-dates,
+html[data-theme='dark'] .mesocycle-notes,
+html[data-theme='dark'] .week-indicator,
+html[data-theme='dark'] .date-text,
+html[data-theme='dark'] .workout-duration,
+html[data-theme='dark'] .stat-label,
+html[data-theme='dark'] .stat-value,
+html[data-theme='dark'] .workout-notes p {
+  color: var(--color-text) !important;
+}
+
+html[data-theme='dark'] .progress-label,
+html[data-theme='dark'] .days-remaining,
+html[data-theme='dark'] .split-date,
+html[data-theme='dark'] .split-info,
+html[data-theme='dark'] .split-card-action,
+html[data-theme='dark'] .history-count {
+  color: var(--color-text-light) !important;
+}
+
+html[data-theme='dark'] .split-card.clickable {
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+}
+
+html[data-theme='dark'] .split-card.next {
+  background: #2b3264;
+  border-color: #8a88ff;
+}
+
+html[data-theme='dark'] .split-card.next .split-status,
+html[data-theme='dark'] .split-card.next .split-card-action {
+  color: #c4c3ff !important;
+}
+
+html[data-theme='dark'] .split-card.completed {
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
+}
+
+html[data-theme='dark'] .progress-bar,
+html[data-theme='dark'] .mesocycle-card .progress-bar {
+  background: var(--color-surface-muted);
+}
+
+html[data-theme='dark'] .mesocycle-dates,
+html[data-theme='dark'] .mesocycle-notes {
+  border-color: var(--color-border);
+  background: var(--color-surface-muted);
+}
+
+html[data-theme='dark'] .split-badge,
+html[data-theme='dark'] .exercise-tag {
+  color: var(--color-text) !important;
+  background: var(--color-surface-muted);
+}
+
 /* Small screens: prioritize one clear action and comfortable reading */
 @media (max-width: 639px) {
   :root {
@@ -1276,6 +1357,187 @@ html[data-theme='dark'] .sets-table-header {
   .copy-split-dialog {
     max-height: calc(100vh - 1.5rem);
     border-radius: 18px;
+  }
+}
+
+/* Responsive shell correction: keep desktop navigation out of the phone UI. */
+.nav-desktop {
+  display: none;
+}
+
+.nav-mobile {
+  display: flex;
+}
+
+.filters-toggle {
+  display: none;
+}
+
+.history-filters {
+  display: block;
+}
+
+@media (min-width: 640px) {
+  .nav-desktop {
+    display: flex;
+  }
+
+  .nav-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .header .container {
+    justify-content: flex-start;
+  }
+
+  .main {
+    padding-bottom: calc(
+      1rem + var(--mobile-nav-height) + env(safe-area-inset-bottom)
+    );
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .progress-header {
+    display: block;
+    padding: 1.25rem 0 0.75rem;
+    text-align: left;
+  }
+
+  .progress-header h1 {
+    max-width: 12ch;
+    font-size: clamp(1.8rem, 8vw, 2.25rem);
+  }
+
+  .progress-subtitle {
+    max-width: 32ch;
+    margin-top: 0.5rem;
+  }
+
+  .progress-tabs {
+    position: sticky;
+    top: 3.2rem;
+    z-index: 20;
+    justify-content: flex-start;
+    margin-bottom: 0.9rem;
+    padding: 0.25rem;
+    scrollbar-width: none;
+  }
+
+  .progress-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    min-height: 2.8rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .history-header {
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .history-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .filters-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 2.8rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 0.85rem;
+    margin-bottom: 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    background: var(--color-surface);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 750;
+    text-align: left;
+  }
+
+  .filters-count {
+    color: var(--color-primary-dark);
+    font-size: 0.78rem;
+  }
+
+  .history-filters {
+    display: none;
+    margin-bottom: 0.9rem;
+  }
+
+  .history-filters.filters-open {
+    display: block;
+  }
+
+  .history-filters .filter-row {
+    gap: 0.55rem;
+  }
+
+  .history-filters .date-filter {
+    display: grid;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    align-items: center;
+    width: 100%;
+  }
+
+  .history-filters .date-input {
+    width: 100%;
+  }
+
+  .history-filters .clear-filters-btn {
+    width: 100%;
+    min-height: 2.85rem;
+  }
+
+  .workout-card {
+    padding: 0.9rem;
+  }
+
+  .workout-card:focus-visible {
+    outline-offset: 2px;
+  }
+
+  .workout-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .exercise-tag {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .modal-footer {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .modal-footer > button {
+    flex: 1 1 12rem;
   }
 }
 

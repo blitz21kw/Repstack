@@ -23,6 +23,16 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
   const [filterMesocycle, setFilterMesocycle] = useState<string>('');
   const [dateRangeStart, setDateRangeStart] = useState<string>('');
   const [dateRangeEnd, setDateRangeEnd] = useState<string>('');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const activeFilterCount = [
+    searchTerm,
+    filterExercise,
+    filterMuscleGroup,
+    filterMesocycle,
+    dateRangeStart,
+    dateRangeEnd,
+  ].filter(Boolean).length;
 
   // Filter workouts based on criteria
   const filteredWorkouts = useMemo(() => {
@@ -143,17 +153,31 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
         </p>
       </div>
 
-      <div className="history-filters">
+      <button
+        type="button"
+        className="filters-toggle"
+        aria-expanded={showFilters}
+        onClick={() => setShowFilters((isOpen) => !isOpen)}
+      >
+        <span>{showFilters ? 'Hide filters' : 'Filter workouts'}</span>
+        {activeFilterCount > 0 && (
+          <span className="filters-count">{activeFilterCount} active</span>
+        )}
+      </button>
+
+      <div className={`history-filters ${showFilters ? 'filters-open' : ''}`}>
         <div className="filter-row">
           <input
             type="text"
             placeholder="Search notes..."
+            aria-label="Search workout notes"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
 
           <select
+            aria-label="Filter by exercise"
             value={filterExercise}
             onChange={(e) => setFilterExercise(e.target.value)}
             className="filter-select"
@@ -167,6 +191,7 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
           </select>
 
           <select
+            aria-label="Filter by muscle group"
             value={filterMuscleGroup}
             onChange={(e) => setFilterMuscleGroup(e.target.value)}
             className="filter-select"
@@ -185,6 +210,7 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
           </select>
 
           <select
+            aria-label="Filter by mesocycle"
             value={filterMesocycle}
             onChange={(e) => setFilterMesocycle(e.target.value)}
             className="filter-select"
@@ -200,8 +226,9 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
 
         <div className="filter-row">
           <div className="date-filter">
-            <label>From:</label>
+            <label htmlFor="history-from">From:</label>
             <input
+              id="history-from"
               type="date"
               value={dateRangeStart}
               onChange={(e) => setDateRangeStart(e.target.value)}
@@ -210,8 +237,9 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
           </div>
 
           <div className="date-filter">
-            <label>To:</label>
+            <label htmlFor="history-to">To:</label>
             <input
+              id="history-to"
               type="date"
               value={dateRangeEnd}
               onChange={(e) => setDateRangeEnd(e.target.value)}
@@ -236,7 +264,16 @@ export default function WorkoutHistory({ onViewWorkout }: WorkoutHistoryProps) {
             <div
               key={workout.id}
               className="workout-card"
+              role="button"
+              tabIndex={0}
+              aria-label={`View workout from ${formatDate(workout.date)}`}
               onClick={() => onViewWorkout?.(workout.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  onViewWorkout?.(workout.id);
+                }
+              }}
             >
               <div className="workout-card-header">
                 <div className="workout-date">

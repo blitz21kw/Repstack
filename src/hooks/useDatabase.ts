@@ -42,6 +42,7 @@ export {
   updateMesocycle,
   deleteMesocycle,
   clearAllData,
+  clearProgressData,
   exportData,
   importData,
 } from '../db/service';

@@ -10,6 +10,7 @@ import {
   exportData,
   importData,
   clearAllData,
+  clearProgressData,
 } from '../../hooks/useDatabase';
 import { seedStarterExercises } from '../../lib/seedData';
 import ConfirmDialog from '../common/ConfirmDialog';
@@ -28,6 +29,8 @@ export default function Settings({
 }: SettingsProps) {
   const userProfiles = useUserProfiles();
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showClearProgressConfirm, setShowClearProgressConfirm] =
+    useState(false);
   const [showImportConfirm, setShowImportConfirm] = useState(false);
   const [importFileContent, setImportFileContent] = useState<string>('');
   const [message, setMessage] = useState<{
@@ -121,6 +124,17 @@ export default function Settings({
     } catch (error) {
       console.error('Failed to clear data:', error);
       showMessage('error', 'Failed to clear data');
+    }
+  };
+
+  const handleClearProgressData = async () => {
+    try {
+      await clearProgressData();
+      setShowClearProgressConfirm(false);
+      showMessage('success', 'Workout progress cleared');
+    } catch (error) {
+      console.error('Failed to clear workout progress:', error);
+      showMessage('error', 'Failed to clear workout progress');
     }
   };
 
@@ -434,6 +448,19 @@ export default function Settings({
 
         <div className="settings-field">
           <button
+            onClick={() => setShowClearProgressConfirm(true)}
+            className="btn-danger btn-danger-outline"
+          >
+            🧹 Clear Workout Progress
+          </button>
+          <p className="field-description">
+            Remove workout history, statistics, and feedback while keeping your
+            plans and exercise library
+          </p>
+        </div>
+
+        <div className="settings-field">
+          <button
             onClick={() => setShowClearConfirm(true)}
             className="btn-danger"
           >
@@ -525,6 +552,18 @@ export default function Settings({
           variant="danger"
           onConfirm={handleClearAllData}
           onCancel={() => setShowClearConfirm(false)}
+        />
+      )}
+
+      {showClearProgressConfirm && (
+        <ConfirmDialog
+          title="Clear Workout Progress?"
+          message="This removes completed workouts, statistics, and workout feedback. Your profile, exercise library, and mesocycle plans will stay safe."
+          confirmLabel="Clear Progress"
+          cancelLabel="Keep Progress"
+          variant="danger"
+          onConfirm={handleClearProgressData}
+          onCancel={() => setShowClearProgressConfirm(false)}
         />
       )}
 

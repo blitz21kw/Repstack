@@ -1,21 +1,27 @@
+import { useState } from 'react';
 import { useExercises } from '../../hooks/useDatabase';
 import type { Workout } from '../../types/models';
 import {
   calculateSetVolume,
   calculateExerciseVolume,
 } from '../../lib/progressTracking';
+import ConfirmDialog from '../common/ConfirmDialog';
 import './WorkoutDetail.css';
 
 interface WorkoutDetailProps {
   workout: Workout;
   onClose: () => void;
+  onDelete?: (workoutId: string) => Promise<void>;
 }
 
 export default function WorkoutDetail({
   workout,
   onClose,
+  onDelete,
 }: WorkoutDetailProps) {
   const exercises = useExercises();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -55,6 +61,21 @@ export default function WorkoutDetail({
       (total, ex) => total + calculateExerciseVolume(ex.sets),
       0
     );
+  };
+
+  const handleDeleteWorkout = async () => {
+    if (!onDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await onDelete(workout.id);
+      onClose();
+    } catch (error) {
+      console.error('Failed to delete workout:', error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   if (!exercises) {
@@ -210,11 +231,32 @@ export default function WorkoutDetail({
         </div>
 
         <div className="modal-footer">
+          {onDelete && (
+            <button
+              className="btn-danger btn-delete-workout"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isDeleting}
+            >
+              🗑️ Delete Workout
+            </button>
+          )}
           <button className="close-footer-btn" onClick={onClose}>
             Close
           </button>
         </div>
       </div>
+
+      {showDeleteConfirm && (
+        <ConfirmDialog
+          title="Delete this workout?"
+          message="This removes the workout, its sets, feedback, and progress totals. Your plan and exercise library will stay safe."
+          confirmLabel={isDeleting ? 'Deleting…' : 'Delete Workout'}
+          cancelLabel="Keep Workout"
+          onConfirm={handleDeleteWorkout}
+          onCancel={() => setShowDeleteConfirm(false)}
+          variant="danger"
+        />
+      )}
     </div>
   );
 }

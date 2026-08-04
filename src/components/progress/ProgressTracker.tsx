@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useWorkout } from '../../hooks/useDatabase';
+import { deleteWorkout, useWorkout } from '../../hooks/useDatabase';
 import WorkoutHistory from './WorkoutHistory';
 import WorkoutDetail from './WorkoutDetail';
 import ProgressStats from './ProgressStats';
@@ -24,6 +24,10 @@ export default function ProgressTracker() {
     setSelectedWorkoutId(null);
   };
 
+  const handleDeleteWorkout = async (workoutId: string) => {
+    await deleteWorkout(workoutId);
+  };
+
   return (
     <div className="progress-tracker">
       <div className="progress-header">
@@ -36,27 +40,31 @@ export default function ProgressTracker() {
       <div className="progress-tabs">
         <button
           className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+          aria-pressed={activeTab === 'history'}
           onClick={() => setActiveTab('history')}
         >
-          📋 History
+          History
         </button>
         <button
           className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
+          aria-pressed={activeTab === 'stats'}
           onClick={() => setActiveTab('stats')}
         >
-          📊 Statistics
+          Stats
         </button>
         <button
           className={`tab-btn ${activeTab === 'records' ? 'active' : ''}`}
+          aria-pressed={activeTab === 'records'}
           onClick={() => setActiveTab('records')}
         >
-          🏆 Records
+          Records
         </button>
         <button
           className={`tab-btn ${activeTab === 'calendar' ? 'active' : ''}`}
+          aria-pressed={activeTab === 'calendar'}
           onClick={() => setActiveTab('calendar')}
         >
-          📅 Calendar
+          Calendar
         </button>
       </div>
 
@@ -70,7 +78,11 @@ export default function ProgressTracker() {
       </div>
 
       {selectedWorkoutId && selectedWorkout && (
-        <WorkoutDetail workout={selectedWorkout} onClose={handleCloseWorkout} />
+        <WorkoutDetail
+          workout={selectedWorkout}
+          onClose={handleCloseWorkout}
+          onDelete={handleDeleteWorkout}
+        />
       )}
     </div>
   );

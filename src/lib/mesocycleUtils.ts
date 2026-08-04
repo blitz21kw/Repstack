@@ -53,16 +53,15 @@ export async function updateMesocycleProgress(
     .filter((w) => w.mesocycleId === mesocycleId)
     .toArray();
 
-  if (workouts.length === 0) {
-    return;
-  }
-
   // Find the most recent completed workout
   const completedWorkouts = workouts
     .filter((w) => w.completed)
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   if (completedWorkouts.length === 0) {
+    if (mesocycle.currentWeek !== 1) {
+      await updateMesocycle(mesocycleId, { currentWeek: 1 });
+    }
     return;
   }
 

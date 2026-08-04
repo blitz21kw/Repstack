@@ -297,6 +297,8 @@ export async function updateWorkout(
 }
 
 export async function deleteWorkout(id: string): Promise<void> {
+  const workout = await db.workouts.get(id);
+
   // Also delete associated training sessions
   const sessions = await db.trainingSessions
     .where('workoutId')
@@ -307,6 +309,10 @@ export async function deleteWorkout(id: string): Promise<void> {
     db.workouts.delete(id),
     ...sessions.map((session) => db.trainingSessions.delete(session.id)),
   ]);
+
+  if (workout?.mesocycleId) {
+    await updateMesocycleProgress(workout.mesocycleId);
+  }
 }
 
 // ===== TrainingSession CRUD =====
@@ -497,6 +503,29 @@ export async function clearAllData(): Promise<void> {
     db.trainingSessions.clear(),
     db.mesocycles.clear(),
   ]);
+}
+
+/**
+ * Remove workout history and feedback while keeping the user's profile,
+ * exercise library, and training plans intact.
+ */
+export async function clearProgressData(): Promise<void> {
+  const activeMesocycles = await db.mesocycles
+    .where('status')
+    .equals('active')
+    .toArray();
+
+  await Promise.all([
+    db.workouts.clear(),
+    db.trainingSessions.clear(),
+    ...activeMesocycles.map((mesocycle) =>
+      db.mesocycles.update(mesocycle.id, {
+        currentWeek: 1,
+        updatedAt: new Date(),
+      })
+    ),
+  ]);
+  clearAutoSavedWorkout();
 }
 
 // ===== Workout Logging Helpers =====

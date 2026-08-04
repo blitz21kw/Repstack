@@ -16,6 +16,7 @@ import {
   deleteExercise,
   getAllExercises,
   createWorkout,
+  createTrainingSession,
   getWorkout,
   updateWorkout,
   deleteWorkout,
@@ -27,6 +28,7 @@ import {
   recoverActiveWorkout,
   autoSaveWorkout,
   clearAutoSavedWorkout,
+  clearProgressData,
 } from '../db/service';
 
 describe('Database Service - User Profiles', () => {
@@ -468,6 +470,56 @@ describe('Database Service - Workouts', () => {
 
       const workout = await getWorkout(id);
       expect(workout).toBeUndefined();
+    });
+  });
+
+  describe('clearProgressData', () => {
+    it('should clear workout history while keeping plans and exercises', async () => {
+      const exerciseId = await createExercise({
+        name: 'Bench Press',
+        category: 'barbell' as const,
+        muscleGroups: ['chest' as const],
+        isCustom: true,
+      });
+      const mesocycleId = await createMesocycle({
+        name: 'Test Plan',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-02-11'),
+        durationWeeks: 6,
+        currentWeek: 1,
+        deloadWeek: 6,
+        trainingSplit: 'upper_lower' as const,
+        splitDays: [],
+        status: 'active' as const,
+      });
+      const workoutId = await createWorkout({
+        date: new Date('2024-01-10'),
+        mesocycleId,
+        exercises: [{ exerciseId, sets: [] }],
+        completed: true,
+      });
+
+      await createTrainingSession({
+        workoutId,
+        exerciseId,
+        date: new Date('2024-01-10'),
+        pump: 4,
+        soreness: 2,
+        fatigue: 2,
+        performance: 'good',
+      });
+      await updateMesocycle(mesocycleId, { currentWeek: 3 });
+      localStorage.setItem('activeWorkout', 'stale-workout');
+
+      await clearProgressData();
+
+      expect(await db.workouts.count()).toBe(0);
+      expect(await db.trainingSessions.count()).toBe(0);
+      expect(await db.exercises.count()).toBe(1);
+      expect(await db.mesocycles.get(mesocycleId)).toMatchObject({
+        currentWeek: 1,
+      });
+      expect(localStorage.getItem('activeWorkout')).toBeNull();
     });
   });
 });
