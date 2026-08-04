@@ -6,27 +6,32 @@ import App from './App.tsx';
 import './ui-upgrade.css';
 import { initializeDatabase } from './db/index.ts';
 
-// Register service worker with auto-update
-// When a new version is available, it will automatically reload the page
+// Register service worker with auto-update. Installed PWAs should not stay on
+// an older navigation shell after a deployment.
 const updateSW = registerSW({
+  immediate: true,
   onNeedRefresh() {
-    // New content is available, reload to update
-    if (confirm('New version available! Reload to update?')) {
-      updateSW(true);
-    }
+    void updateSW(true);
   },
   onOfflineReady() {
     console.log('App ready to work offline');
   },
   onRegisteredSW(swUrl, registration) {
-    // Check for updates every hour
+    // Check periodically and whenever the app becomes active again. This is
+    // especially important for an app opened from an iPhone home-screen icon.
     if (registration) {
-      setInterval(
-        () => {
-          registration.update();
-        },
-        60 * 60 * 1000
-      );
+      const checkForUpdates = () => {
+        void registration.update();
+      };
+
+      setInterval(checkForUpdates, 15 * 60 * 1000);
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          checkForUpdates();
+        }
+      });
+      window.addEventListener('online', checkForUpdates);
     }
     console.log('Service worker registered:', swUrl);
   },
