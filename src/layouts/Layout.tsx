@@ -35,24 +35,24 @@ export default function Layout({
         <div className="container">
           <h1 className="logo">Repstack</h1>
           <nav className="mobile-header-actions" aria-label="Quick navigation">
-            <a
-              href="#progress"
+            <button
+              type="button"
               className={`mobile-header-action ${currentPage === 'progress' ? 'active' : ''}`}
               onClick={handleNavClick('progress')}
-              aria-current={currentPage === 'progress' ? 'page' : undefined}
+              aria-pressed={currentPage === 'progress'}
             >
               Progress
-            </a>
-            <a
-              href="#settings"
+            </button>
+            <button
+              type="button"
               className={`mobile-header-action mobile-header-settings ${currentPage === 'settings' ? 'active' : ''}`}
               onClick={handleNavClick('settings')}
-              aria-current={currentPage === 'settings' ? 'page' : undefined}
+              aria-pressed={currentPage === 'settings'}
               aria-label="Settings"
             >
               <span aria-hidden="true">⚙️</span>
               <span className="mobile-header-settings-label">Settings</span>
-            </a>
+            </button>
           </nav>
           {/* Desktop navigation - hidden on mobile */}
           <nav className="nav nav-desktop" aria-label="Main navigation">
