@@ -259,6 +259,10 @@ select:focus-visible,
   white-space: nowrap;
 }
 
+.mobile-header-action::after {
+  content: attr(data-label);
+}
+
 .mobile-header-action:hover,
 .mobile-header-action.active {
   color: var(--color-primary-dark);

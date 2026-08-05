@@ -39,19 +39,19 @@ export default function Layout({
               type="button"
               className={`mobile-header-action ${currentPage === 'progress' ? 'active' : ''}`}
               onClick={handleNavClick('progress')}
+              aria-label="Progress"
               aria-pressed={currentPage === 'progress'}
-            >
-              Progress
-            </button>
+              data-label="Progress"
+            ></button>
             <button
               type="button"
               className={`mobile-header-action mobile-header-settings ${currentPage === 'settings' ? 'active' : ''}`}
               onClick={handleNavClick('settings')}
               aria-pressed={currentPage === 'settings'}
               aria-label="Settings"
+              data-label="Settings"
             >
               <span aria-hidden="true">⚙️</span>
-              <span className="mobile-header-settings-label">Settings</span>
             </button>
           </nav>
           {/* Desktop navigation - hidden on mobile */}
